@@ -8,6 +8,9 @@ add_executable(SimpleChatClient WIN32
     chatwindow.ui
     chatwindow.h
     chatclient.h
+	chatwithone.h
+	chatwithone.cpp
+	chatwithone.ui
 )
 target_link_libraries(SimpleChatClient PRIVATE Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network)
 #target_compile_definitions(SimpleChatClient PRIVATE QT_NO_CAST_FROM_ASCII)

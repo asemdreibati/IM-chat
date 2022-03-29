@@ -5,6 +5,7 @@
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QTimer>
+#include<QJsonArray>
 ChatServer::ChatServer(QObject *parent)
     : QTcpServer(parent)
 {}
@@ -32,10 +33,23 @@ void ChatServer::broadcast(const QJsonObject &message, ServerWorker *exclude)
 {
     for (ServerWorker *worker : m_clients) {
         Q_ASSERT(worker);
-        if (worker == exclude)
+        if (worker == exclude && !message.contains("users"))
             continue;
         sendJson(worker, message);
     }
+}
+
+void ChatServer::unicast(const QJsonObject &message, ServerWorker *destination)
+{
+    sendJson(destination, message);
+    //for (ServerWorker *worker : m_clients) {
+       // Q_ASSERT(worker);
+       // if (worker == destination)
+        //{
+       //     sendJson(worker, message);
+        //    break;
+       // }
+    //}
 }
 
 void ChatServer::jsonReceived(ServerWorker *sender, const QJsonObject &doc)
@@ -59,6 +73,17 @@ void ChatServer::userDisconnected(ServerWorker *sender)
         emit logMessage(userName + QLatin1String(" disconnected"));
     }
     sender->deleteLater();
+
+
+    QJsonObject online_users;
+    online_users[QStringLiteral("type")] = QStringLiteral("online");
+    QJsonArray users;
+    for(int i=0;i<m_clients.size();i++)
+    {
+        users.append(m_clients.at(i)->userName());
+    }
+    online_users[QStringLiteral("users")] = users;
+   broadcast(online_users, sender);
 }
 
 void ChatServer::userError(ServerWorker *sender)
@@ -110,6 +135,16 @@ void ChatServer::jsonFromLoggedOut(ServerWorker *sender, const QJsonObject &docO
     connectedMessage[QStringLiteral("type")] = QStringLiteral("newuser");
     connectedMessage[QStringLiteral("username")] = newUserName;
     broadcast(connectedMessage, sender);
+
+    QJsonObject online_users;
+    online_users[QStringLiteral("type")] = QStringLiteral("online");
+    QJsonArray users;
+    for(int i=0;i<m_clients.size();i++)
+    {
+        users.append(m_clients.at(i)->userName());
+    }
+    online_users[QStringLiteral("users")] = users;
+   broadcast(online_users, sender);
 }
 
 void ChatServer::jsonFromLoggedIn(ServerWorker *sender, const QJsonObject &docObj)
@@ -118,19 +153,46 @@ void ChatServer::jsonFromLoggedIn(ServerWorker *sender, const QJsonObject &docOb
     const QJsonValue typeVal = docObj.value(QLatin1String("type"));
     if (typeVal.isNull() || !typeVal.isString())
         return;
-    if (typeVal.toString().compare(QLatin1String("message"), Qt::CaseInsensitive) != 0)
-        return;
+
     const QJsonValue textVal = docObj.value(QLatin1String("text"));
     if (textVal.isNull() || !textVal.isString())
         return;
     const QString text = textVal.toString().trimmed();
     if (text.isEmpty())
         return;
+
     QJsonObject message;
-    message[QStringLiteral("type")] = QStringLiteral("message");
-    message[QStringLiteral("text")] = text;
-    message[QStringLiteral("sender")] = sender->userName();
-    broadcast(message, sender);
+    if (typeVal.toString().compare(QLatin1String("message"), Qt::CaseInsensitive) == 0)
+    {
+        message[QStringLiteral("type")] = QLatin1String("message");
+        message[QStringLiteral("text")] = text;
+        message[QStringLiteral("sender")] = sender->userName();
+        broadcast(message,sender);
+    }
+    else if(typeVal.toString().compare(QLatin1String("private"), Qt::CaseInsensitive) == 0)
+    {
+
+            message[QStringLiteral("type")] = QLatin1String("private");
+            message[QStringLiteral("text")] = text;
+
+            message[QStringLiteral("sender")] = sender->userName();
+            message[QStringLiteral("reciever")] = docObj.value(QLatin1String("reciever"));
+            for(int i=0;i<m_clients.size();i++)
+            {
+                if(m_clients.at(i)->userName()== docObj.value(QLatin1String("reciever")).toString().trimmed())
+                {
+                    unicast(message, m_clients.at(i));
+                    break;
+
+                }
+            }
+    }
+
+    else return;
+
+
+
+
 }
 
 

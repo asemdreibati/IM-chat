@@ -5,11 +5,15 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QHostAddress>
+#include<QDebug>
+
+#include"ChatWithOne.h"
 ChatWindow::ChatWindow(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::ChatWindow) // create the elements defined in the .ui file
     , m_chatClient(new ChatClient(this)) // create the chat client
     , m_chatModel(new QStandardItemModel(this)) // create the model to hold the messages
+
 {
     // set up of the .ui file
     ui->setupUi(this);
@@ -31,7 +35,12 @@ ChatWindow::ChatWindow(QWidget *parent)
     // connect the click of the "send" button and the press of the enter while typing to the slot that sends the message
     connect(ui->sendButton, &QPushButton::clicked, this, &ChatWindow::sendMessage);
     connect(ui->messageEdit, &QLineEdit::returnPressed, this, &ChatWindow::sendMessage);
+
+    connect(m_chatClient, &ChatClient::show_online_users, this, &ChatWindow::show_online_users);
+    connect(m_chatClient, &ChatClient::recive_private_message, this, &ChatWindow::recive_private_message, Qt::QueuedConnection);
+
 }
+
 
 ChatWindow::~ChatWindow()
 {
@@ -258,4 +267,52 @@ void ChatWindow::error(QAbstractSocket::SocketError socketError)
     ui->chatView->setEnabled(false);
     // reset the last printed username
     m_lastUserName.clear();
+}
+
+
+
+void ChatWindow::show_online_users(const QJsonArray &online_users)
+{
+    ui->listWidget->clear();
+    for(int i=0;i<online_users.size();i++)
+    {
+        if(online_users.at(i)==m_chatClient->get_user_name())
+            continue;
+        ui->listWidget->addItem(QString(online_users.at(i).toString()));
+    }
+}
+
+
+void ChatWindow::on_chat_with_selected_clicked()
+{
+    if( ui->listWidget->count()>0 && ui->listWidget->selectedItems().count()>0){
+        QString user_name=ui->listWidget->currentItem()->text();
+        if(! this->private_chats_.contains(user_name))
+        {
+            this->private_chats_.append(user_name);
+            ChatWithOne dialog(this,user_name,this->m_chatClient);
+            dialog.setModal(true);
+            dialog.exec();
+            this->private_chats_.removeOne(user_name);
+        }
+    }
+
+
+}
+
+void ChatWindow::recive_private_message(QString sender, QString text)
+{
+    qDebug("ASDASDA");
+    if(!this->private_chats_.contains(sender) ){
+        this->private_chats_.append(sender);
+        ChatWithOne dialog(this,sender,this->m_chatClient);
+        dialog.setModal(true);
+        emit send_to_dialog(sender,text);
+        dialog.exec();
+        this->private_chats_.removeOne(sender);
+        return;
+    }
+     emit send_to_dialog(sender,text);
+
+
 }

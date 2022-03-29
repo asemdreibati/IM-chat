@@ -18,6 +18,8 @@ public slots:
     void stopServer();
 private slots:
     void broadcast(const QJsonObject &message, ServerWorker *exclude);
+    void unicast(const QJsonObject &message, ServerWorker *destination);
+
     void jsonReceived(ServerWorker *sender, const QJsonObject &doc);
     void userDisconnected(ServerWorker *sender);
     void userError(ServerWorker *sender);

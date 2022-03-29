@@ -22,9 +22,18 @@ ChatClient::ChatClient(QObject *parent)
     connect(m_clientSocket, &QTcpSocket::disconnected, this, [this]()->void{m_loggedIn = false;});
 }
 
+QString ChatClient::get_user_name() const
+{
+    if(! user_name_.isEmpty())
+        return user_name_;
+    return "";
+
+}
+
 void ChatClient::login(const QString &userName)
 {
     if (m_clientSocket->state() == QAbstractSocket::ConnectedState) { // if the client is connected
+        user_name_=userName;
         // create a QDataStream operating on the socket
         QDataStream clientStream(m_clientSocket);
         // set the version so that programs compiled with different versions of Qt can agree on how to serialise
@@ -50,6 +59,23 @@ void ChatClient::sendMessage(const QString &text)
     QJsonObject message;
     message[QStringLiteral("type")] = QStringLiteral("message");
     message[QStringLiteral("text")] = text;
+    // send the JSON using QDataStream
+    clientStream << QJsonDocument(message).toJson();
+}
+
+void ChatClient::send_private_message(const QString &text,const QString &destination )
+{
+    if (text.isEmpty())
+        return; // We don't send empty messages
+    // create a QDataStream operating on the socket
+    QDataStream clientStream(m_clientSocket);
+    // set the version so that programs compiled with different versions of Qt can agree on how to serialise
+    clientStream.setVersion(QDataStream::Qt_5_7);
+    // Create the JSON we want to send
+    QJsonObject message;
+    message[QStringLiteral("type")] = QStringLiteral("private");
+    message[QStringLiteral("text")] = text;
+    message[QStringLiteral("reciever")] = destination;
     // send the JSON using QDataStream
     clientStream << QJsonDocument(message).toJson();
 }
@@ -107,7 +133,25 @@ void ChatClient::jsonReceived(const QJsonObject &docObj)
             return; // the username was invalid so we ignore
         // we notify of the user disconnection the userLeft signal
         emit userLeft(usernameVal.toString());
-    }
+    }else if (typeVal.toString().compare(QLatin1String("online"), Qt::CaseInsensitive) == 0) { // All Online users
+          const QJsonValue online_users = docObj.value(QLatin1String("users"));
+          if (online_users.isNull() || !online_users.isArray())
+              return;
+          emit show_online_users(online_users.toArray());
+     }else if (typeVal.toString().compare(QLatin1String("private"), Qt::CaseInsensitive) == 0) { // Private message
+        const QJsonValue textVal = docObj.value(QLatin1String("text"));
+        if (textVal.isNull() || !textVal.isString())
+            return;
+        const QJsonValue senderVal = docObj.value(QLatin1String("sender"));
+        if (senderVal.isNull() || !senderVal.isString())
+            return;
+
+        const QJsonValue recieverVal = docObj.value(QLatin1String("reciever"));
+        if (recieverVal.isNull() || !recieverVal.isString())
+            return;
+
+        emit recive_private_message(senderVal.toString(),textVal.toString());
+   }
 }
 
 void ChatClient::connectToServer(const QHostAddress &address, quint16 port)
