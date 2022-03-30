@@ -4,36 +4,43 @@
 #include <QDialog>
 #include "chatclient.h"
 #include "chatwindow.h"
+#include "chat.h"
 
 namespace Ui {
 class ChatWithOne;
 }
+
 /// @brief Manage the private dialog.
-class ChatWithOne : public QDialog
+class ChatWithOne : public Chat
 {
     Q_OBJECT
 
 public:
-    explicit ChatWithOne(QWidget *parent = 0 ,QString user_destination="" , ChatClient* socket_wrapper=0 );
-    ~ChatWithOne();
-    /// @brief Send the input message to the corresponding socket wrapper.
-    void sendMessage();
 
-    QString get_user_destination();
+    /// @brief Constructor.
+    explicit ChatWithOne(QWidget *parent = 0 ,QString user_name="" , ChatClient* user_socket=0 );
+
+    /// @brief Destructor.
+    ~ChatWithOne();
+
+    /// @brief Send the input message to the corresponding socket wrapper.
+    void send_message() override;
+
+    QString get_user_name();
+
 private slots:
+
     /// @brief Receive a message from the main window to display it in the dialog.
-    void recieve_message(QString sender, QString text);
-    /// @brief trigger send message metod.
-    void on_send_button_clicked();
-    /// @brief Cancel the dialog .
-    void on_cancel_clicked();
+    void recieve_message(QString sender, QString text,QVector<QString> group_members={});
+
 
 private:
-    Ui::ChatWithOne *ui;
-    QString user_destination_;
-    /// @brief Wrapper socket which is the same as in the parent (Main window ) to handle the communications as the same user.
-    ChatClient *socket_wrapper_;
 
+    /// @brief Represents the private chat window .
+    Ui::ChatWithOne *ui;
+
+    /// @brief Clinent name.
+    QString user_name_;
 };
 
 #endif // CHATWITHONE_H

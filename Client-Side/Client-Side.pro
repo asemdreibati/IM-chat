@@ -24,4 +24,5 @@ HEADERS += \
     chatwindow.h \
     chatclient.h \
     chatwithone.h \
-    chatwithgroup.h
+    chatwithgroup.h \
+    chat.h

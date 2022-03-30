@@ -2,40 +2,56 @@
 #define CHATWITHGROUP_H
 
 #include <QDialog>
+#include "chat.h"
 #include "chatclient.h"
 #include "chatwindow.h"
+
 namespace Ui {
 class ChatWithGroup;
 }
+
 /// @brief Manage the group dialog.
-class ChatWithGroup : public QDialog
+class ChatWithGroup : public Chat
 {
     Q_OBJECT
 
 public:
+    /// @brief Constructor.
     explicit ChatWithGroup(QWidget *parent = 0,QVector<QString> group_members={} , ChatClient* member_socket=0);
+
+    /// @brief Destructor.
     ~ChatWithGroup();
+
     /// @brief Send the input message to the corresponding socket wrapper.
-    void sendMessage();
+    void send_message() override;
+
+    /// @brief Set client socket .
+    void set_group_members(QVector<QString> group_members)
+    {
+        for(int i=0;i<group_members.count();i++)
+        {
+            this->group_members_.append(group_members.at(i));
+        }
+    }
+
+    /// @brief Returns group members .
+    QVector<QString> get_group_members()
+    {
+        return this->group_members_;
+    }
 
 
 private slots:
 
-    void on_pushButton_clicked();
-    /// @brief Receive the message from the corresponding socket to display it  .
-    /// @param sender 
-    /// @param text 
-    /// @param group_members 
-    void recieve_message(QString sender, QString text,QVector<QString> group_members);
-    /// @brief Cancel the dialog .
-    void on_cancel_clicked();
+    void recieve_message(QString sender, QString text,QVector<QString> group_members={});
+
 
 private:
+    /// @brief Represents the group window .
     Ui::ChatWithGroup *ui;
+
     /// @brief List of all group members .
     QVector<QString> group_members_;
-   /// @brief Wrapper socket which is the same as in the parent (Main window ) to handle the communications as the same user.
-   ChatClient* member_socket_;
 };
 
 #endif // CHATWITHGROUP_H

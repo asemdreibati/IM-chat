@@ -265,12 +265,12 @@ void ChatWindow::recive_group_message(QString senderVal, QString textVal,QVector
         group_chats_.append(group_chats.at(i));
         ChatWithGroup dialog(this,group_chats_,this->m_chatClient);
         dialog.setModal(true);
-        emit send_to_group_dialog(senderVal,textVal,group_chats_);
+        emit send_to_dialog(senderVal,textVal,group_chats_);
         dialog.exec();
         this->group_chats_.clear();
         return;
     }
-     emit send_to_group_dialog(senderVal,textVal,group_chats_);
+     emit send_to_dialog(senderVal,textVal,group_chats_);
 }
 
 

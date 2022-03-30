@@ -29,10 +29,10 @@
     </widget>
    </item>
    <item>
-    <widget class="QListWidget" name="listWidget"/>
+    <widget class="QListWidget" name="chat_panel"/>
    </item>
    <item>
-    <widget class="QLineEdit" name="lineEdit"/>
+    <widget class="QLineEdit" name="input_field"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -44,7 +44,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="cancel">
+      <widget class="QPushButton" name="cancel_button">
        <property name="text">
         <string>Cancel</string>
        </property>

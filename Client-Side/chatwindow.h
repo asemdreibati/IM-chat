@@ -74,12 +74,8 @@ private slots:
 
 signals:
     /// @brief Send information to the private dialog .
-    void send_to_dialog(QString sender, QString text);
-    /// @brief Send information to the group dialog .
-    /// @param senderVal 
-    /// @param textVal 
-    /// @param group_chats 
-    void send_to_group_dialog(QString senderVal,QString textVal,QVector<QString> group_chats);
+    void send_to_dialog(QString sender, QString text,QVector<QString> group_members={});
+
 };
 
 #endif // CHATWINDOW_H
