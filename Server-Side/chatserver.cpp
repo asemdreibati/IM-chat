@@ -39,17 +39,25 @@ void ChatServer::broadcast(const QJsonObject &message, ServerWorker *exclude)
     }
 }
 
+void ChatServer::multicast(const QJsonObject &message, QJsonArray group_members)
+{
+    for(int i=0;i<group_members.size();i++)
+    {
+        for (ServerWorker *worker : m_clients)
+        {
+            if(worker->userName()==group_members.at(i).toString()){
+                sendJson(worker, message);
+                break;
+            }
+        }
+
+    }
+}
+
 void ChatServer::unicast(const QJsonObject &message, ServerWorker *destination)
 {
     sendJson(destination, message);
-    //for (ServerWorker *worker : m_clients) {
-       // Q_ASSERT(worker);
-       // if (worker == destination)
-        //{
-       //     sendJson(worker, message);
-        //    break;
-       // }
-    //}
+
 }
 
 void ChatServer::jsonReceived(ServerWorker *sender, const QJsonObject &doc)
@@ -186,6 +194,17 @@ void ChatServer::jsonFromLoggedIn(ServerWorker *sender, const QJsonObject &docOb
 
                 }
             }
+    }
+    else if(typeVal.toString().compare(QLatin1String("group"), Qt::CaseInsensitive) == 0)
+    {
+
+            message[QStringLiteral("type")] = QLatin1String("group");
+            message[QStringLiteral("text")] = text;
+            message[QStringLiteral("sender")] = sender->userName();
+            QJsonArray group_members=docObj.value(QLatin1String("group_members")).toArray();
+            message[QStringLiteral("group_members")] = group_members;
+
+            multicast(message,group_members);
     }
 
     else return;

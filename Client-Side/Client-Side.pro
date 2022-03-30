@@ -12,13 +12,16 @@ SOURCES += \
     clientmain.cpp \
     chatwindow.cpp \
     chatclient.cpp \
-    chatwithone.cpp
+    chatwithone.cpp \
+    chatwithgroup.cpp
 
 FORMS += \
     chatwindow.ui \
-    chatwithone.ui
+    chatwithone.ui \
+    chatwithgroup.ui
 
 HEADERS += \
     chatwindow.h \
     chatclient.h \
-    chatwithone.h
+    chatwithone.h \
+    chatwithgroup.h

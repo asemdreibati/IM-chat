@@ -1,6 +1,5 @@
 #include "chatwithone.h"
 #include "ui_chatwithone.h"
-#include "chatwindow.h"
 
 ChatWithOne::ChatWithOne(QWidget *parent, QString user_destination , ChatClient* socket_wrapper) :
     QDialog(parent),
@@ -26,11 +25,13 @@ QString ChatWithOne::get_user_destination()
 void ChatWithOne::sendMessage()
 {
 
-    socket_wrapper_->send_private_message(ui->lineEdit->text(),this->user_destination_);
-    //socket_wrapper_->sendMessage(ui->lineEdit->text());
-    ui->listWidget->addItem("Me:");
-    ui->listWidget->addItem(ui->lineEdit->text());
-    ui->lineEdit->setText("");
+    if(!ui->lineEdit->text().isEmpty())
+    {
+        socket_wrapper_->send_private_message(ui->lineEdit->text(),this->user_destination_);
+        ui->listWidget->addItem("Me:");
+        ui->listWidget->addItem(ui->lineEdit->text());
+        ui->lineEdit->setText("");
+    }
 }
 
 void ChatWithOne::recieve_message(QString sender, QString text)

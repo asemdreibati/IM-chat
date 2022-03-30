@@ -12,7 +12,6 @@ add_executable(SimpleChatServer WIN32
     serverwindow.ui
 )
 target_link_libraries(SimpleChatServer PRIVATE Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network)
-#target_compile_definitions(SimpleChatServer PRIVATE QT_NO_CAST_FROM_ASCII)
 set_target_properties(SimpleChatServer PROPERTIES
 	AUTOMOC ON
 	AUTOUIC ON

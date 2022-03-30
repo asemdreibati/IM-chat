@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QTcpSocket>
 #include <QJsonArray>
+#include<QVector>
 
 class QHostAddress;
 class QJsonDocument;
@@ -15,6 +16,7 @@ public:
     explicit ChatClient(QObject *parent = nullptr);
     QString get_user_name() const;
     void send_private_message(const QString &text,const QString &destination );
+    void send_group_message(const QString &text,const QVector<QString> &group_members );
 
 public slots:
     void connectToServer(const QHostAddress &address, quint16 port);
@@ -35,6 +37,7 @@ signals:
     void show_online_users(const QJsonArray &online_users);
 
     void recive_private_message(QString senderVal,QString textVal);
+    void recive_group_message(QString senderVal,QString textVal,QVector<QString> group_chats);
 private:
     QTcpSocket *m_clientSocket;
     bool m_loggedIn;

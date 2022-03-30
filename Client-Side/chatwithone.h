@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "chatclient.h"
+#include "chatwindow.h"
 
 namespace Ui {
 class ChatWithOne;

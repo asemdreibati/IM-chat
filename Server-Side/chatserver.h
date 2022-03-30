@@ -3,6 +3,7 @@
 
 #include <QTcpServer>
 #include <QVector>
+#include<QJsonArray>
 class ServerWorker;
 class ChatServer : public QTcpServer
 {
@@ -18,6 +19,7 @@ public slots:
     void stopServer();
 private slots:
     void broadcast(const QJsonObject &message, ServerWorker *exclude);
+    void multicast(const QJsonObject &message, QJsonArray group_members);
     void unicast(const QJsonObject &message, ServerWorker *destination);
 
     void jsonReceived(ServerWorker *sender, const QJsonObject &doc);
