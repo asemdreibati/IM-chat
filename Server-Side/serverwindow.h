@@ -6,7 +6,9 @@
 namespace Ui {
 class ServerWindow;
 }
+
 class ChatServer;
+/// @brief Controls the interface in the Server side. 
 class ServerWindow : public QWidget
 {
     Q_OBJECT
@@ -16,10 +18,14 @@ public:
     ~ServerWindow();
 
 private:
+    /// @brief Holds the main window.
     Ui::ServerWindow *ui;
+    /// @brief Represents the central server in each instance.
     ChatServer *m_chatServer;
 private slots:
     void toggleStartServer();
+    /// @brief Display the message in the server panel.
+    /// @param msg 
     void logMessage(const QString &msg);
 };
 

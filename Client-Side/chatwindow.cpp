@@ -34,7 +34,7 @@ ChatWindow::ChatWindow(QWidget *parent)
     connect(m_chatClient, &ChatClient::show_online_users, this, &ChatWindow::show_online_users);
     connect(m_chatClient, &ChatClient::recive_private_message, this, &ChatWindow::recive_private_message, Qt::QueuedConnection);
     connect(m_chatClient, &ChatClient::recive_group_message, this, &ChatWindow::recive_group_message, Qt::QueuedConnection);
-
+    this->ui->user_name->setText("");
 }
 
 
@@ -78,6 +78,7 @@ void ChatWindow::loggedIn()
     ui->messageEdit->setEnabled(true);
     ui->chatView->setEnabled(true);
     m_lastUserName.clear();
+    this->ui->user_name->setText("Name: "+m_chatClient->get_user_name());
 }
 
 void ChatWindow::loginFailed(const QString &reason)

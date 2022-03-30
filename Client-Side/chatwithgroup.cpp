@@ -49,3 +49,8 @@ void ChatWithGroup::recieve_message(QString sender, QString text, QVector<QStrin
 
 }
 
+
+void ChatWithGroup::on_cancel_clicked()
+{
+     this->close();
+}

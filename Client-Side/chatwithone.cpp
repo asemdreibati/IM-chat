@@ -40,7 +40,14 @@ void ChatWithOne::recieve_message(QString sender, QString text)
     ui->listWidget->addItem(text);
 }
 
-void ChatWithOne::on_pushButton_clicked()
+
+void ChatWithOne::on_send_button_clicked()
 {
-    sendMessage();
+     sendMessage();
+}
+
+
+void ChatWithOne::on_cancel_clicked()
+{
+    this->close();
 }
