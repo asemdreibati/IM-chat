@@ -1,6 +1,6 @@
 project(IMChat LANGUAGES CXX)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-find_package(Qt5 5.7 COMPONENTS Core Gui Widgets Network REQUIRED)
+find_package(Qt6 6.9.2 COMPONENTS Core Gui Widgets Network REQUIRED)
 add_executable(SimpleChatClient WIN32
     clientmain.cpp
     chatwindow.cpp
@@ -16,11 +16,12 @@ add_executable(SimpleChatClient WIN32
 	chatwithgroup.ui
 	chat.h
 )
-target_link_libraries(SimpleChatClient PRIVATE Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network)
+
+target_link_libraries(SimpleChatClient PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Network)
 set_target_properties(SimpleChatClient PROPERTIES
 	AUTOMOC ON
 	AUTOUIC ON
-	CXX_STANDARD 11
+	CXX_STANDARD 17
 	CXX_STANDARD_REQUIRED ON
 	VERSION "1.0.0"
 )
