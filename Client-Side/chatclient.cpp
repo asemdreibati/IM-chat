@@ -15,7 +15,7 @@ ChatClient::ChatClient(QObject *parent)
     connect(m_clientSocket, &QTcpSocket::connected, this, &ChatClient::connected);
     connect(m_clientSocket, &QTcpSocket::disconnected, this, &ChatClient::disconnected);
     connect(m_clientSocket, &QTcpSocket::readyRead, this, &ChatClient::onReadyRead);
-    connect(m_clientSocket, QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::error), this, &ChatClient::error);
+    connect(m_clientSocket, QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::errorOccurred), this, &ChatClient::error);
     connect(m_clientSocket, &QTcpSocket::disconnected, this, [this]()->void{m_loggedIn = false;});
 }
 

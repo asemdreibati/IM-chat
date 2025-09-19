@@ -10,7 +10,7 @@ ServerWorker::ServerWorker(QObject *parent)
 {
     connect(m_serverSocket, &QTcpSocket::readyRead, this, &ServerWorker::receiveJson);
     connect(m_serverSocket, &QTcpSocket::disconnected, this, &ServerWorker::disconnectedFromClient);
-    connect(m_serverSocket, QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::error), this, &ServerWorker::error);
+    connect(m_serverSocket, QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::errorOccurred), this, &ServerWorker::error);
 }
 
 
